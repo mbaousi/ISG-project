@@ -1,0 +1,8 @@
+#!/bin/bash
+echo conf terminal
+echo dynamic-template
+cat mazandaran | grep -i 'type service' | grep -v per | while read line
+do
+echo $line
+echo 'accounting aaa list ibs-isg type service periodic-interval 10'
+done

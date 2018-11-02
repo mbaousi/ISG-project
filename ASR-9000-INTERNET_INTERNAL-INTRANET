@@ -1,0 +1,58 @@
+#!/bin/bash
+file="/home/mbaousi/Desktop/allservice"
+
+echo 'Please Set update periodic acc (MIN):'
+read interm
+
+while IFS=, read name
+do
+echo "policy-map INTERNET_$name"
+ echo 'class INTERNET'
+  echo "police rate $name kbps"
+  echo '!'
+ echo '!'
+ echo 'class class-default'
+ echo '!'
+ echo 'end-policy-map'
+echo '!'
+echo "policy-map INTRANET_$name"
+ echo 'class INTRANET'
+  echo "police rate $name kbps"
+  echo '!'
+ echo '!'
+ echo 'class class-default'
+echo '!'
+echo 'end-policy-map'
+echo '!'
+echo "policy-map INTERNAL_$name"
+echo 'class INTERNAL'
+  echo "police rate $name kbps"
+  echo '!'
+ echo '!'
+ echo 'class class-default'
+ echo '!'
+ echo 'end-policy-map'
+echo '!'
+
+
+done < $file
+
+while IFS=, read name
+do
+
+echo 'dynamic-template'
+echo "type service INTERNET__$name"
+ echo "service-policy input INTERNET_$name merge 30 acct-stats"
+  echo "service-policy output INTERNET_$name merge 30 acct-stats"
+  echo "accounting aaa list ibs-isg type service periodic-interval $interm"
+
+echo "type service INTRANET__$name"
+  echo "service-policy input INTRANET_$name merge 30 acct-stats"
+  echo "service-policy output INTRANET_$name merge 30 acct-stats"
+  echo "accounting aaa list ibs-isg type service periodic-interval $interm"
+
+echo "type service INTERNAL__$name"
+  echo "service-policy input INTERNAL_$name merge 20 acct-stats"
+  echo "service-policy output INTERNAL_$name merge 20 acct-stats"
+ echo "accounting aaa list ibs-isg type service periodic-interval $interm"
+done < $file
